@@ -11,9 +11,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'email is required.'],
   },
-  roles: [{ 
-    type: Schema.Types.ObjectId, 
-    ref: 'Role' }],
+  roles: {
+    type: String,
+  },
   reg_date: {
     type: Date,
     default: Date.now

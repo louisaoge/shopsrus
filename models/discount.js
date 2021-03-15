@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 const DiscountSchema = new mongoose.Schema({
     discount_type: {
     type: String,
-    required: [true, 'fdiscount_type is required.'],
+    required: [true, 'discount_type is required.'],
   },
   discount_rate: {
     type: Number,

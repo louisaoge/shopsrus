@@ -4,15 +4,15 @@ module.exports = app => {
   var router = require("express").Router();
 
   // Retrieve a single user with id
-  router.get("/all/:id/", users.findOne);
+  router.get("/all/:id/", users.findOneUser);
 
     // Retrieve a single user with name
    router.get("/name/:name/", users.findName);
 
   // Retrieve all users
-  router.get("/all/", users.findAll);
+  router.get("/all/", users.findAllUsers);
 
-  router.post("/create/", users.create)
+  router.post("/create/", users.createUser)
 
   app.use('/api/users', router);
 }

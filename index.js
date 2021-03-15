@@ -1,5 +1,5 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+//const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const config = require('./config/db');
@@ -44,17 +44,18 @@ var allowCrossDomain = function(req, res, next) {
 };
 
 app.use(allowCrossDomain);
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
 app.use(morgan('dev'));
 
-app.use(bodyParser.json({limit:'50mb'})); 
-app.use(bodyParser.urlencoded({extended:true, limit:'50mb'}));
+app.use(express.json({limit:'50mb'})); 
+app.use(express.urlencoded({extended:true, limit:'50mb'}));
 
 
 // Initialize routes middleware
 
 require("./routes/users")(app);
 require("./routes/discounts")(app);
+require("./routes/order")(app);
 
 // Use express's default error handling middleware
 app.use(function (err, req, res, next) {
