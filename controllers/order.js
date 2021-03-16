@@ -5,49 +5,49 @@ const HttpStatus = require('../config/httpstatus');
 
 async function isLoyalCustomer(orderId) {
     const loyalCus = 2;
-    let isLoyal;
-    try { await Order.findOne({
+    var twoYearsFromNow = new Date();
+    twoYearsFromNow.setFullYear(twoYearsFromNow.getFullYear() - 2);
+    let isLoyal = false;
+    const query = await Order.findOne({
         _id: orderId
-    }, function (err, data) {
-        if (data.customer[0].reg_date = "2021-01-05T12:17:28.783+00:00") {
-            isLoyal = true
-            return isLoyal
-        } else {
-            return false
-        }
     }).populate('customer')
+
+    const cusId = query.customer[0]._id
+
+
+    const query2 = await Order.findOne({
+        _id: orderId,
+        customer: [cusId],
+        reg_date: {
+            $lte: twoYearsFromNow
+        }
+    })
+    if (query2) {
+        isLoyal = true
+    } else {
+        isLoyal = false
+    }
+
     return isLoyal
-}
-catch (err) {
-    console.log(err) 
-}
+
+
 }
 
 async function getUserType(orderId) {
-    let cusRoles;
-   try{ await Order.findOne({
+    let cusRoles = '';
+    const query = await Order.findOne({
         _id: orderId
-    }, function (err, data) {
-        if (data) {
-            cusRoles = data.customer[0].roles
-            return cusRoles
-        } else {
-            return false
-        }
-
     }).populate('customer')
+
+    if (query.customer[0].roles) {
+        cusRoles = query.customer[0].roles
+    }
     return cusRoles
-}
-catch (err) {
-    console.log(err) 
-}
 }
 
 async function getDiscountRate(orderId) {
-
     const user_type = await getUserType(orderId)
     const isloyalist = await isLoyalCustomer(orderId)
-    //console.log(isloyalist)
     let discount_rate = 0;
     if (user_type == 'employee') {
         discount_rate = 0.3;
@@ -63,33 +63,27 @@ async function getDiscountRate(orderId) {
 
 
 async function getTotalAmount(orderId) {
-    let total_amount;
-    try { await Order.findOne({
+    let total_amount1 = 0;
+    const query = await Order.findOne({
         _id: orderId
-    }, function (err, data) {
-        if (data) {
-            total_amount = data.totalAmount
-        }
     })
-    return total_amount
-}catch (err) {
-    console.log(err) 
-}
+
+    if (query) {
+        total_amount1 = query.totalAmount
+    }
+    return total_amount1
 }
 
 async function get_non_grocery_amount(orderId) {
-    let non_grocery_sum;
-    try {await Order.findOne({
+    let non_grocery_sum = 0;
+    const query = await Order.findOne({
         _id: orderId
-    }, function (err, data) {
-            if (data.product[0].category != 'grocery') {
-                non_grocery_sum = data.product[0].price
-            }
     }).populate('product')
+
+    if (query.product[0].category != 'grocery') {
+        non_grocery_sum = query.product[0].price
+    }
     return non_grocery_sum
-}catch (err) {
-    console.log(err) 
-}
 }
 
 function get_fixed_discount(order_amount) {
@@ -100,11 +94,10 @@ module.exports = {
     async get_order_summary(req, res) {
         const orderId = req.query.orderId;
         const user_discount_rate = await getDiscountRate(orderId);
-        //console.log(user_discount_rate);
         const totalAmount = await getTotalAmount(orderId);
-        const fixedDiscount = await get_fixed_discount(totalAmount);
+
+        const fixedDiscount = get_fixed_discount(totalAmount);
         const non_grocery_sum = await get_non_grocery_amount(orderId);
-        console.log(non_grocery_sum);
         const percentage_discount = non_grocery_sum * user_discount_rate;
         const net_amount = totalAmount - (fixedDiscount + percentage_discount);
 
