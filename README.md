@@ -16,3 +16,6 @@ BASE URL LOCAL http://localhost:3000/
 
 BASE API URL api/
 
+e.g endpoint 
+http://localhost:3000/api/users/all/  //to get all users
+
